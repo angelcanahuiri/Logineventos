@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .text-danger {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 class="text-center mb-4">Registro de Usuario</h2>
+        <form id="registroForm">
+            <!-- Datos de Usuario -->
+            <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese su nombre de usuario" required>
+                <small id="errorUsuario" class="text-danger"></small>
+            </div>
+            <div class="mb-3">
+                <label for="clave" class="form-label">Clave</label>
+                <input type="password" class="form-control" id="clave" name="clave" placeholder="Ingrese una contraseña segura" required>
+                <small id="errorClave" class="text-danger"></small>
+            </div>
+
+            <!-- Datos de Cliente -->
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="apellido" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="apellido" name="apellido" placeholder="Ingrese su apellido" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Ingrese su número de teléfono" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su correo electrónico" required>
+            </div>
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ingrese su dirección" required>
+            </div>
+            <div class="mb-3">
+                <label for="distrito" class="form-label">Distrito</label>
+                <input type="number" class="form-control" id="distrito" name="distrito" placeholder="Ingrese su distrito" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" id="btnRegistrar">Registrar</button>
+            <a href="index.html" class="btn btn-secondary w-100 mt-2">Regresar</a>
+        </form>
+        <p id="mensajeError" class="text-danger text-center mt-3"></p>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Validaciones en tiempo real
+            $('#nombreUsuario').on('input', function () {
+                if ($(this).val().length < 4) {
+                    $('#errorUsuario').text('El usuario debe tener al menos 4 caracteres.');
+                } else {
+                    $('#errorUsuario').text('');
+                }
+            });
+
+            $('#clave').on('input', function () {
+                if ($(this).val().length < 6) {
+                    $('#errorClave').text('La contraseña debe tener al menos 6 caracteres.');
+                } else {
+                    $('#errorClave').text('');
+                }
+            });
+
+            // Manejo del formulario
+            $('#registroForm').on('submit', function (event) {
+                event.preventDefault();
+
+                // Obtener los valores de los campos
+                var data = {
+                    nombreUsuario: $('#nombreUsuario').val().trim(),
+                    clave: $('#clave').val().trim(),
+                    nombre: $('#nombre').val().trim(),
+                    apellido: $('#apellido').val().trim(),
+                    telefono: $('#telefono').val().trim(),
+                    email: $('#email').val().trim(),
+                    direccion: $('#direccion').val().trim(),
+                    distrito: $('#distrito').val().trim(),
+                };
+
+                var mensajeError = $('#mensajeError');
+
+                // Validación adicional
+                if (!data.nombreUsuario || !data.clave || !data.nombre || !data.apellido || !data.telefono || !data.email || !data.direccion || !data.distrito) {
+                    mensajeError.text('Todos los campos son obligatorios.');
+                    return;
+                }
+
+                // Mostrar spinner mientras se procesa
+                $('#btnRegistrar').prop('disabled', true).text('Procesando...');
+
+                // Enviar la solicitud AJAX
+                $.ajax({
+                    url: "ServletRegistro.php",
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function (response) {
+                        //alert(response);
+                        //mensajeError.text(response);
+                        $('#btnRegistrar').prop('disabled', false).text('Registrar');
+                        if (response === 0) {
+                            mensajeError.text('Error al registrar.');
+                        } else if (response === 1) {
+                            mensajeError.text('Usuario ya registrado.');
+                        } else if (response === 2) {
+                            //alert('Usuario registrado exitosamente.');
+                             mensajeError.text('Usuario registrado exitosamente.');
+                            $('#registroForm')[0].reset();
+                        }
+                    },
+                    error: function () {
+                        //$('#btnRegistrar').prop('disabled', false).text('Registrar');
+                        mensajeError.text('');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+<!--
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mt-5">Registrar Usuario</h2>
+        <form id="registroForm" method="post">
+            <!-- Datos de Usuario
+            <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
+            </div>
+            <div class="mb-3">
+                <label for="clave" class="form-label">Clave</label>
+                <input type="password" class="form-control" id="clave" name="clave" required>
+            </div>
+
+            <!-- Datos de Cliente
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="apellido" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="apellido" name="apellido" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" required>
+            </div>
+            <div class="mb-3">
+                <label for="distrito" class="form-label">Distrito</label>
+                <input type="number" class="form-control" id="distrito" name="distrito" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btnRegistrar">Registrar</button>
+            <a href="index.html" class="btn btn-secondary">Regresar</a>
+        </form>
+        <p id="mensajeError" class="text-danger mt-3"></p>
+    </div>
+</body>
+</html>
+<script>
+$(document).ready(function () {
+    $('#registroForm').on('submit', function (event) {
+        event.preventDefault(); // Evitar el envío predeterminado del formulario
+
+        // Obtener los valores de los campos
+        var data = {
+            nombreUsuario: $('#nombreUsuario').val().trim(),
+            clave: $('#clave').val().trim(),
+            nombre: $('#nombre').val().trim(),
+            apellido: $('#apellido').val().trim(),
+            telefono: $('#telefono').val().trim(),
+            email: $('#email').val().trim(),
+            direccion: $('#direccion').val().trim(),
+            distrito: $('#distrito').val().trim(),
+        };
+
+        var mensajeError = $('#mensajeError');
+
+        // Validar campos
+        if (!data.nombreUsuario || !data.clave || !data.nombre || !data.apellido || !data.telefono || !data.email || !data.direccion || !data.distrito) {
+            mensajeError.text('Todos los campos son obligatorios.');
+            return;
+        }
+        if (data.clave.length < 6) {
+            mensajeError.text('La clave debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        // Limpiar el mensaje de error
+        mensajeError.text('');
+        $('#btnRegistrar').prop('disabled', true); // Desactivar el botón mientras se procesa
+
+        // Enviar la solicitud AJAX
+        $.ajax({
+            url: "ServletRegitstro.php",
+            type: "POST",
+            data: data,
+            dataType: "json",
+            success: function (response) {
+                $('#btnRegistrar').prop('disabled', false); // Reactivar el botón
+                if (response === 0) {
+                    mensajeError.text('Error al registrar.');
+                } else if (response === 1) {
+                    mensajeError.text('Usuario ya registrado.');
+                } else if (response === 2) {
+                    alert('Usuario registrado exitosamente.');
+                    $('#registroForm')[0].reset(); // Limpiar el formulario
+                }
+            },
+            error: function () {
+                $('#btnRegistrar').prop('disabled', false); // Reactivar el botón
+                mensajeError.text('Error de conexión con el servidor.');
+            }
+        });
+    });
+});
+</script>
+-->
+
+
+<!--
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mt-5">Registrar Usuario</h2>
+        <form id="registroForm" method="post">
+            <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
+            </div>
+            <div class="mb-3">
+                <label for="clave" class="form-label">Clave</label>
+                <input type="password" class="form-control" id="clave" name="clave" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btnRegistrar">Registrar</button>
+            <a href="index.html" class="btn btn-secondary">Regresar</a>
+        </form>
+        <p id="mensajeError" class="text-danger mt-3"></p>
+    </div>
+</body>
+</html>
+<script>
+$(document).ready(function () {
+    $('#registroForm').on('submit', function (event) {
+        event.preventDefault(); // Evitar el envío predeterminado del formulario
+
+        // Obtener los valores de los campos
+        var nombreUsuario = $('#nombreUsuario').val().trim();
+        var clave = $('#clave').val().trim();
+        var mensajeError = $('#mensajeError');
+
+        // Validar campos
+        if (nombreUsuario === '' || clave === '') {
+            mensajeError.text('Todos los campos son obligatorios.');
+            return;
+        }
+        if (clave.length < 6) {
+            mensajeError.text('La clave debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        // Limpiar el mensaje de error
+        mensajeError.text('');
+        $('#btnRegistrar').prop('disabled', true); // Desactivar el botón mientras se procesa
+
+        // Enviar la solicitud AJAX
+        $.ajax({
+            url: "ServletRegitstro.php",
+            type: "GET",
+            data: { nombreUsuario: nombreUsuario, clave: clave },
+            dataType: "json",
+            success: function (response) {
+                $('#btnRegistrar').prop('disabled', false); // Reactivar el botón
+                if (response === 0) {
+                    mensajeError.text('Error al registrar.');
+                } else if (response === 1) {
+                    mensajeError.text('Usuario ya registrado.');
+                } else if (response === 2) {
+                    alert('Usuario registrado exitosamente.');
+                    // Redirigir o limpiar el formulario
+                    $('#registroForm')[0].reset();
+                }
+            },
+            error: function () {
+                $('#btnRegistrar').prop('disabled', false); // Reactivar el botón
+                mensajeError.text('Error de conexión con el servidor.');
+            }
+        });
+    });
+});
+</script>
+
+-->
+
+<!--  
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mt-5">Registrar Usuario</h2>
+        <form  method="post">
+            <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+                <input type="text" class="form-control" id="nombreUsuario" name="nombreUsuario" required>
+            </div>
+            <div class="mb-3">
+                <label for="clave" class="form-label">Clave</label>
+                <input type="password" class="form-control" id="clave" name="clave" required>
+            </div>
+            <button onclick="vaidar()" class="btn btn-primary">Registrar</button>
+            <a href="index.html" class="btn btn-secondary">Regresar</a>
+        </form>
+        <p class="text-danger">
+          
+        </p>
+    </div>
+</body>
+</html>
+<script>
+function vaidar()
+{    
+    var nombreUsuario=document.getElementById('nombreUsuario').value;
+    var clave=document.getElementById('clave').value;
+	
+    $.ajax({
+        beforeSend: function () {
+        },
+        cache: false,
+        type: 'GET',
+        dataType: 'json',
+        url: "ServletRegitstro.php?nombreUsuario=" + nombreUsuario+"&clave="+clave,
+        success: function (response) {
+		
+            	if(response === 0)
+	    	{
+			alert('Error al registrar');
+		}else if(response === 1){
+			alert('Usuario ya registrado');
+		}else if(response === 2){
+			alert('Usuario registrado exitosamente');
+		}
+        }, error: function (result) {
+            alert('ERROR EN CONEXION DE AJAX');
+        }
+    });
+}
+</script>
+-->

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <div class="container">
+	<br><br>
+	<a href='index.html' class='btn btn-primary'>Salir</a>
+	<div id="tabla" style="display: block">
+        <h2 class="text-center mt-5">Mantenimiento de Usuarios</h2>
+        <form  method="post">
+            <table border='1' class="table">
+		<thead>
+		<tr>
+			<th>Usuario</th>
+                        <!-- < -->
+                        <th><th></th><th>Acciones</th></th>
+			<th><th></th></th>
+		</tr>
+		</thead>
+		<tbody id='data'></tbody>
+	</table>
+        </form>
+        <p class="text-danger">
+            
+        </p>
+	</div>
+	<div id="formulario" style="display: none">
+		<form  method="post">
+            <div class="mb-3">
+                <label for="nombreUsuario" class="form-label">Nombre de Usuario</label>
+		<input type="hidden" class="form-control" id="id" name="id" required>
+                <input type="text" class="form-control" id="usuario" name="usuario" required>
+            </div>           
+            <button onclick="actualizar()" class="btn btn-primary">Actualizar</button>
+		<a onclick="cancelar()" class="btn btn-secondary">Cncelar</a>
+        </form>
+	</div>
+
+    </div>
+</body>
+</html>
+
+<script>
+function vaidar()
+{    
+  
+	
+    $.ajax({
+        beforeSend: function () {
+        },
+        cache: false,
+        type: 'GET',
+        dataType: 'json',
+        url: "ServletLoad.php",
+        success: function (response) {
+
+		$('#data').empty(); /*limpia la data*/
+		$('#data').append(response); /*carga la data*/
+            	
+        }, error: function (result) {
+            alert('ERROR EN CONEXION DE AJAX');
+        }
+    });
+}
+vaidar();
+function eliminar(id)
+{
+	$.ajax({
+        beforeSend: function () {
+        },
+        cache: false,
+        type: 'GET',
+        dataType: 'json',
+        url: "ServletDelete.php?id="+id,
+        success: function (response) {
+
+		vaidar();
+            	
+        }, error: function (result) {
+            alert('ERROR EN CONEXION DE AJAX');
+        }
+    });
+}
+
+function editar(id,usuario)
+{
+	
+	document.getElementById('tabla').style.display='none';
+	document.getElementById('formulario').style.display='block';	
+	document.getElementById('id').value=id;
+	document.getElementById('usuario').value=usuario;
+
+}
+function actualizar()
+{
+var id=document.getElementById('id').value;
+var usuario=document.getElementById('usuario').value;
+$.ajax({
+        beforeSend: function () {
+        },
+        cache: false,
+        type: 'GET',
+        dataType: 'json',
+        url: "ServletUpdate.php?id="+id+"&usuario="+usuario,
+        success: function (response) {
+
+	document.getElementById('tabla').style.display='block';
+	document.getElementById('formulario').style.display='none';
+            	
+        }, error: function (result) {
+            alert('ERROR EN CONEXION DE AJAX');
+        }
+    });
+}
+
+function cancelar()
+{
+       document.getElementById('tabla').style.display='block';
+	document.getElementById('formulario').style.display='none';	
+}
+
+</script>
